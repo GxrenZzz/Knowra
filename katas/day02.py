@@ -109,3 +109,20 @@ def test_regex_and_string():
     assert words_strings_method("Ünïcode CAFÉ") == ["ünïcode", "café"]
     assert words_regex_method("Ünïcode CAFÉ") == ["ünïcode", "café"]
 
+# E3 Implementaion
+# 1. Check whether n <= 0. If so, return [] immediately.
+# 2. Tokenize the text using your E2 implementation.
+# 3. Normalize the stopwords so they match your lowercase tokens. Treat None as an empty set.
+# 4. Create an empty dictionary for word counts.
+# 5. Loop through the tokens. Skip stopwords; otherwise increment the word's count.
+# 6. Sort the dictionary entries by descending count, then alphabetical word order.
+# 7. Return only the first n entries as a list of (word, count) tuples.
+from collections import Counter
+
+def top_words_dict(text:str , n:int , stopward=set[str] | None = None) -> list[tuple[str,int]]:
+   if n <=0:
+      return [] 
+   if stopward == None:
+      stopward = set() 
+   text = words_regex_method(text)
+   

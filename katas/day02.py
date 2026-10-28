@@ -64,3 +64,47 @@ def test_words_strings_method():
     assert words_strings_method("hello!!!world") == ["hello", "world"]
 
 
+
+#E2(Regex Version)
+import re
+def words_regex_method(text:str)->list[str]:
+   # 1.Convert text to lowercase.
+   # 2.Keep Unicode letters and digits.
+   # 3.Preserve apostrophes only between two alphanumeric characters.
+   # 4.Treat punctuation, whitespace, and underscores as separators.
+   # 5.Ignore empty tokens.
+
+   text = text.lower()
+   regex_tokens = re.findall(r"[^\W_]+(?:'[^\W_]+)*",text)
+   return regex_tokens
+
+# E2 Test Cases 
+def test_words_regex_method():
+   assert words_regex_method("Hello! World") == ["hello", "world"]
+   assert words_regex_method("don't stop") == ["don't", "stop"]
+   assert words_regex_method("'hello'") == ["hello"]
+   assert words_regex_method("rock'n'roll") == ["rock'n'roll"]
+   assert words_regex_method("AI2026") == ["ai2026"]
+   assert words_regex_method("Café 中文") == ["café", "中文"]
+   assert words_regex_method("") == []
+   assert words_regex_method("hello_world") == ["hello", "world"]
+
+#E2 Test cases for both string and Regex
+
+def test_regex_and_string():
+    assert words_strings_method("Don't panic -- it's 42!") == ["don't", "panic", "it's", "42"]
+    assert words_regex_method("Don't panic -- it's 42!") == ["don't", "panic", "it's", "42"]
+    assert words_strings_method("Hello, WORLD!") == ["hello", "world"]
+    assert words_regex_method("Hello, WORLD!") == ["hello", "world"]
+    assert words_strings_method("") == []
+    assert words_regex_method("") == []
+    assert words_strings_method("   !!! -- ") == []
+    assert words_regex_method("   !!! -- ") == []
+    assert words_strings_method("one  two\nthree\tfour") == ["one", "two", "three", "four"]
+    assert words_regex_method("one  two\nthree\tfour") == ["one", "two", "three", "four"]
+
+    # Decide your Unicode policy before implementing this case.
+    assert words_strings_method("Ünïcode CAFÉ") == ["ünïcode", "café"]
+    assert words_regex_method("Ünïcode CAFÉ") == ["ünïcode", "café"]
+
+    

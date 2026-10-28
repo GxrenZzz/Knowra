@@ -88,6 +88,10 @@ def test_words_regex_method():
    assert words_regex_method("Café 中文") == ["café", "中文"]
    assert words_regex_method("") == []
    assert words_regex_method("hello_world") == ["hello", "world"]
+   assert words_regex_method("hello'") == ["hello"]
+   assert words_regex_method("''hello''") == ["hello"]
+   assert words_regex_method("a_b") == ["a", "b"]
+   assert words_regex_method("can't've") == ["can't've"]
 
 #E2 Test cases for both string and Regex
 
@@ -102,9 +106,6 @@ def test_regex_and_string():
     assert words_regex_method("   !!! -- ") == []
     assert words_strings_method("one  two\nthree\tfour") == ["one", "two", "three", "four"]
     assert words_regex_method("one  two\nthree\tfour") == ["one", "two", "three", "four"]
-
-    # Decide your Unicode policy before implementing this case.
     assert words_strings_method("Ünïcode CAFÉ") == ["ünïcode", "café"]
     assert words_regex_method("Ünïcode CAFÉ") == ["ünïcode", "café"]
 
-    

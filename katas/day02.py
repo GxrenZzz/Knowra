@@ -117,12 +117,129 @@ def test_regex_and_string():
 # 5. Loop through the tokens. Skip stopwords; otherwise increment the word's count.
 # 6. Sort the dictionary entries by descending count, then alphabetical word order.
 # 7. Return only the first n entries as a list of (word, count) tuples.
-from collections import Counter
 
-def top_words_dict(text:str , n:int , stopward=set[str] | None = None) -> list[tuple[str,int]]:
+def top_words_dict(text:str , n:int , stopwards : set[str] | None = None) -> list[tuple[str,int]]:
    if n <=0:
       return [] 
-   if stopward == None:
-      stopward = set() 
-   text = words_regex_method(text)
+   if stopwards is None:
+      stopwards = set() 
+
+   stopwards = {word.lower() for word in stopwards}
    
+   count: dict[str,int] = {}
+   words = words_regex_method(text)
+   for word in words:
+
+      if word in stopwards:
+         continue # passes that word cuz of the context meaning 
+
+      count[word] = count.get(word,0) + 1
+
+   return sorted(count.items(),key=lambda item: (-item[1], item[0]),)[:n]
+
+# E3 1st Version Test Case 
+def test_top_words_dict():
+    assert top_words_dict("pear apple pear banana apple", 2) == [("apple", 2),("pear", 2),]
+    assert top_words_dict("Apple apple BANANA", 3) == [("apple", 2),("banana", 1),]
+    assert top_words_dict("the cat and the dog",5,stopwards={"the", "and"},) == [("cat", 1),("dog", 1),]
+    assert top_words_dict("apple banana", 0) == []
+    assert top_words_dict("apple banana", -1) == []
+    assert top_words_dict("", 3) == []
+    assert top_words_dict("pear pear apple", 10) == [("pear", 2),("apple", 1),]
+
+
+# E3 Second Version 
+from collections import Counter
+def top_words_counter(text:str , n:int , stopwords : set[str] | None = None) -> list[tuple[str,int]] :
+   # condition if n <= 0
+   if n <= 0:
+      return []
+
+   # tokenization of text
+   words = words_regex_method(text)
+
+   # stopward to lowercase
+   if stopwords is None:
+      stopwords = set()
+
+   stopwords = {word.lower() for word in stopwords}
+
+   # Filtering Stopwards
+   filter_words = []
+   for word in words:
+      if word not in stopwords:
+         filter_words.append(word)
+
+   count = Counter(filter_words)
+
+   return sorted(count.items(),key= lambda item : (-item[1],item[0]),)[:n]
+
+def test_top_words_counter():
+   assert top_words_counter("pear apple pear banana apple", 2) == [("apple", 2),("pear", 2),]
+   assert top_words_counter("Apple apple BANANA", 3) == [("apple", 2),("banana", 1),]
+   assert top_words_counter("the cat and the dog",5,stopwords={"the", "and"}) == [("cat", 1),("dog", 1),]
+   assert top_words_counter("The cat the dog",5,stopwords={"THE"}) == [("cat", 1),("dog", 1),]
+   assert top_words_counter("apple banana", 0) == []
+   assert top_words_counter("apple banana", -2) == []
+   assert top_words_counter("", 3) == []
+   assert top_words_counter("pear pear apple", 10) == [("pear", 2),("apple", 1),]
+
+import pytest
+
+@pytest.mark.parametrize(
+    "text, n, stopwords, expected",
+    [
+        (
+            "pear apple pear banana apple",
+            2,
+            None,
+            [("apple", 2), ("pear", 2)],
+        ),
+        (
+            "Apple apple BANANA",
+            3,
+            None,
+            [("apple", 2), ("banana", 1)],
+        ),
+        (
+            "the cat and the dog",
+            5,
+            {"the", "and"},
+            [("cat", 1), ("dog", 1)],
+        ),
+        (
+            "The cat the dog",
+            5,
+            {"THE"},
+            [("cat", 1), ("dog", 1)],
+        ),
+        (
+            "apple banana",
+            0,
+            None,
+            [],
+        ),
+        (
+            "apple banana",
+            -2,
+            None,
+            [],
+        ),
+        (
+            "",
+            3,
+            None,
+            [],
+        ),
+        (
+            "pear pear apple",
+            10,
+            None,
+            [("pear", 2), ("apple", 1)],
+        ),
+    ],
+)
+def test_top_words_implementations(text, n, stopwords, expected):
+    assert top_words_dict(text, n, stopwords) == expected
+    assert top_words_counter(text, n, stopwords) == expected
+

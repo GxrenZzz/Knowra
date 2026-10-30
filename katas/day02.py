@@ -243,3 +243,172 @@ def test_top_words_implementations(text, n, stopwords, expected):
     assert top_words_dict(text, n, stopwords) == expected
     assert top_words_counter(text, n, stopwords) == expected
 
+# E4 Chunking words 
+
+def chunk_words(words: list[str],size: int,overlap: int,) -> list[list[str]]:
+
+    # 1. Validate size
+    if size <= 0:
+        raise ValueError("Size must be greater than 0")
+
+    # 2. Validate overlap
+    if overlap < 0:
+        raise ValueError("Overlap cannot be negative")
+
+    # 3. Validate overlap against size
+    if overlap >= size:
+        raise ValueError("Overlap must be smaller than size")
+
+    # 4. Calculate stride
+    step = size - overlap
+
+    # 5. Handle empty input
+    if not words:
+        return []
+
+    # 6. Generate chunks
+    chunks = []
+
+    for i in range(0, len(words), step):
+        chunk = words[i:i + size]
+        chunks.append(chunk)
+
+    return chunks
+
+# E4 Test Caases 
+
+import pytest
+
+
+# ==========================================
+# E4: CHUNK WORDS — VALID INPUT TEST CASES
+# ==========================================
+
+VALID_CHUNK_CASES = [
+    (
+        "basic_overlap",
+        list("abcdefghij"),
+        4,
+        1,
+        [
+            list("abcd"),
+            list("defg"),
+            list("ghij"),
+            list("j"),
+        ],
+    ),
+    (
+        "no_overlap",
+        list("abcdef"),
+        3,
+        0,
+        [
+            list("abc"),
+            list("def"),
+        ],
+    ),
+    (
+        "maximum_valid_overlap",
+        list("abcde"),
+        3,
+        2,
+        [
+            list("abc"),
+            list("bcd"),
+            list("cde"),
+            list("de"),
+            list("e"),
+        ],
+    ),
+    (
+        "partial_final_chunk",
+        list("abcdefg"),
+        3,
+        0,
+        [
+            list("abc"),
+            list("def"),
+            list("g"),
+        ],
+    ),
+    (
+        "input_smaller_than_size",
+        ["hello", "world"],
+        5,
+        1,
+        [
+            ["hello", "world"],
+        ],
+    ),
+    (
+        "empty_input",
+        [],
+        3,
+        1,
+        [],
+    ),
+    (
+        "single_element_chunks",
+        list("abc"),
+        1,
+        0,
+        [
+            ["a"],
+            ["b"],
+            ["c"],
+        ],
+    ),
+    (
+        "exact_multiple_of_step",
+        list("abcdef"),
+        4,
+        2,
+        [
+            list("abcd"),
+            list("cdef"),
+            list("ef"),
+        ],
+    ),
+    (
+        "single_word",
+        ["hello"],
+        3,
+        0,
+        [
+            ["hello"],
+        ],
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "name, words, size, overlap, expected",
+    VALID_CHUNK_CASES,
+    ids=[case[0] for case in VALID_CHUNK_CASES],
+)
+def test_chunk_words_valid(name, words, size, overlap, expected):
+    assert chunk_words(words, size, overlap) == expected
+
+
+# ==========================================
+# E4: CHUNK WORDS — INVALID INPUT TEST CASES
+# ==========================================
+
+INVALID_CHUNK_CASES = [
+    ("zero_size", ["a", "b"], 0, 0),
+    ("negative_size", ["a", "b"], -1, 0),
+    ("negative_overlap", ["a", "b"], 3, -1),
+    ("overlap_equal_to_size", ["a", "b"], 3, 3),
+    ("overlap_greater_than_size", ["a", "b"], 3, 4),
+]
+
+
+@pytest.mark.parametrize(
+    "name, words, size, overlap",
+    INVALID_CHUNK_CASES,
+    ids=[case[0] for case in INVALID_CHUNK_CASES],
+)
+def test_chunk_words_invalid(name, words, size, overlap):
+    with pytest.raises(ValueError):
+        chunk_words(words, size, overlap)
+
